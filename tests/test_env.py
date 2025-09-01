@@ -1,42 +1,37 @@
-import unittest
+import pytest
 from gymnasium.utils.env_checker import check_env
 from tetris_gym.env import TetrisEnv
 
-class TestTetrisEnv(unittest.TestCase):
+@pytest.fixture
+def env():
+    """Pytest fixture to provide a clean environment instance."""
+    env = TetrisEnv()
+    yield env
+    env.close()
 
-    def test_gym_compliance(self):
-        """
-        Check if the environment is compliant with the Gymnasium API.
-        """
-        # It will raise an exception if it's not compliant
-        env = TetrisEnv()
-        check_env(env)
-        env.close()
-        print("Gymnasium compliance check passed.")
+def test_gym_compliance(env):
+    """
+    Check if the environment is compliant with the Gymnasium API.
+    It will raise an exception if it's not compliant.
+    """
+    check_env(env)
 
-    def test_reset(self):
-        """Test the reset method."""
-        env = TetrisEnv()
-        obs, info = env.reset()
-        self.assertIn("board", obs)
-        self.assertIn("next_piece", obs)
-        self.assertIn("score", info)
-        self.assertEqual(info['score'], 0)
-        env.close()
+def test_reset(env):
+    """Test the reset method."""
+    obs, info = env.reset()
+    assert "board" in obs
+    assert "next_piece" in obs
+    assert "score" in info
+    assert info['score'] == 0
 
-    def test_step(self):
-        """Test a single step in the environment."""
-        env = TetrisEnv()
-        env.reset()
-        action = env.action_space.sample() # Take a random action
-        obs, reward, terminated, truncated, info = env.step(action)
+def test_step(env):
+    """Test a single step in the environment."""
+    env.reset()
+    action = env.action_space.sample()  # Take a random action
+    obs, reward, terminated, truncated, info = env.step(action)
 
-        self.assertIn("board", obs)
-        self.assertIsInstance(reward, (int, float))
-        self.assertIsInstance(terminated, bool)
-        self.assertIsInstance(truncated, bool)
-        self.assertIn("score", info)
-        env.close()
-
-if __name__ == '__main__':
-    unittest.main()
+    assert "board" in obs
+    assert isinstance(reward, (int, float))
+    assert isinstance(terminated, bool)
+    assert isinstance(truncated, bool)
+    assert "score" in info
