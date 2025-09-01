@@ -6,9 +6,11 @@ import os
 
 def main():
     """Main game loop for manual play."""
+    env = None
+    info = None  # Initialize info to prevent unbound variable error
     try:
         # To use gym.make, the package needs to be installed via `pip install -e .`
-        env = gym.make("tetris_gym:env/TetrisEnv-v0", render_mode='human')
+        env = gym.make("TetrisEnv-v0", render_mode='human')
         obs, info = env.reset()
         done = False
 
@@ -64,11 +66,11 @@ def main():
             time.sleep(0.02) # Prevents CPU hogging
 
     finally:
-        if 'env' in locals():
+        if env is not None:
             env.close()
         print("\n" + "="*20)
         print("   GAME OVER")
-        if 'info' in locals() and info:
+        if info and hasattr(info, 'get'):
              print(f"  Final Score: {info.get('score', 0)}")
         print("="*20)
 
